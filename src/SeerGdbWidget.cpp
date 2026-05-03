@@ -10,6 +10,7 @@
 #include "SeerStructVisualizerWidget.h"
 #include "SeerVarVisualizerWidget.h"
 #include "SeerImageVisualizerWidget.h"
+#include "SeerMonitorVisualizerWidget.h"
 #include "SeerHelpPageDialog.h"
 #include "SeerUtl.h"
 #include "QHContainerWidget.h"
@@ -862,6 +863,10 @@ void SeerGdbWidget::handleGdbCommands (const QStringList& commands) {
     for (auto command : commands) {
         handleGdbCommand(command, true);
     }
+}
+
+void SeerGdbWidget::handleGdbMonitorCommand (int id, const QString& command) {
+    handleGdbCommand(QString::number(id)+"-monitor-exec " + command);
 }
 
 void SeerGdbWidget::handleGdbExit () {
@@ -3049,6 +3054,21 @@ void SeerGdbWidget::handleGdbVarVisualizer () {
 void SeerGdbWidget::handleGdbImageVisualizer () {
 
     handleGdbImageAddExpression("");
+}
+
+void SeerGdbWidget::handleGdbMonitorVisualizer () {
+
+    if (executableLaunchMode() == "") {
+        return;
+    }
+
+    SeerMonitorVisualizerWidget* w = new SeerMonitorVisualizerWidget(0);
+    w->show();
+
+    // Connect things.
+    QObject::connect(_gdbMonitor,  &GdbMonitor::astrixTextOutput,                               w,      &SeerMonitorVisualizerWidget::handleText);
+    QObject::connect(_gdbMonitor,  &GdbMonitor::caretTextOutput,                                w,      &SeerMonitorVisualizerWidget::handleText);
+    QObject::connect(w,            &SeerMonitorVisualizerWidget::executeGdbMonitorCommand,      this,   &SeerGdbWidget::handleGdbMonitorCommand);
 }
 
 void SeerGdbWidget::handleSplitterMoved (int pos, int index) {
