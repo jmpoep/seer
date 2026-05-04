@@ -357,7 +357,7 @@ class SeerGdbWidget : public QWidget, protected Ui::SeerGdbWidgetForm {
         void                                handleGdbStructVisualizer                   ();
         void                                handleGdbVarVisualizer                      ();
         void                                handleGdbImageVisualizer                    ();
-        void                                handleGdbMonitorVisualizer                  ();
+        void                                handleGdbMonitor                            ();
         void                                handleSplitterMoved                         (int pos, int index);
         void                                handleGdbAssemblyDisassemblyFlavor          ();
         void                                handleGdbAssemblySymbolDemangling           ();

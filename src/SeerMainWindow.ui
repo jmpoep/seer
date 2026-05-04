@@ -76,8 +76,8 @@
     <addaction name="actionViewStructVisualizer"/>
     <addaction name="actionViewBasicStructVisualizer"/>
     <addaction name="actionViewImageVisualizer"/>
-    <addaction name="actionViewGdbMonitorVisualizer"/>
     <addaction name="actionViewAssembly"/>
+    <addaction name="actionViewGdbMonitor"/>
     <addaction name="menuConsole"/>
     <addaction name="menuStyles"/>
    </widget>
@@ -814,13 +814,13 @@
     <enum>QAction::NoRole</enum>
    </property>
   </action>
-  <action name="actionViewGdbMonitorVisualizer">
+  <action name="actionViewGdbMonitor">
    <property name="icon">
     <iconset resource="resource.qrc">
      <normaloff>:/seer/resources/thenounproject/memory.svg</normaloff>:/seer/resources/thenounproject/memory.svg</iconset>
    </property>
    <property name="text">
-    <string>GDB Monitor Visualizer</string>
+    <string>GDB Monitor</string>
    </property>
   </action>
  </widget>

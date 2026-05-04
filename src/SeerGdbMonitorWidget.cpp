@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "SeerMonitorVisualizerWidget.h"
+#include "SeerGdbMonitorWidget.h"
 #include "SeerHelpPageDialog.h"
 #include "SeerUtl.h"
 #include <QtWidgets/QMessageBox>
@@ -16,7 +16,7 @@
 #include <QtCore/QSettings>
 #include <QtCore/QDebug>
 
-SeerMonitorVisualizerWidget::SeerMonitorVisualizerWidget (QWidget* parent) : QWidget(parent) {
+SeerGdbMonitorWidget::SeerGdbMonitorWidget (QWidget* parent) : QWidget(parent) {
 
     // Init variables.
     _monitorId = Seer::createID(); // Create id for gdb monitor messages.
@@ -53,21 +53,21 @@ SeerMonitorVisualizerWidget::SeerMonitorVisualizerWidget (QWidget* parent) : QWi
     textEdit->setFont(font);
 
     // Connect things.
-    QObject::connect(monitorCommandLineEdit,        &QLineEdit::returnPressed,                                 this,            &SeerMonitorVisualizerWidget::handleCommandLineEdit);
-    QObject::connect(clearToolButton,               &QToolButton::clicked,                                     this,            &SeerMonitorVisualizerWidget::handleClearButton);
-    QObject::connect(saveToolButton,                &QToolButton::clicked,                                     this,            &SeerMonitorVisualizerWidget::handleSaveButton);
-    QObject::connect(printToolButton,               &QToolButton::clicked,                                     this,            &SeerMonitorVisualizerWidget::handlePrintButton);
-    QObject::connect(helpToolButton,                &QToolButton::clicked,                                     this,            &SeerMonitorVisualizerWidget::handleHelpButton);
-    QObject::connect(macroButtonGroup,              &QButtonGroup::buttonClicked,                              this,            &SeerMonitorVisualizerWidget::handleMacroToolButtonClicked);
+    QObject::connect(monitorCommandLineEdit,        &QLineEdit::returnPressed,                                 this,            &SeerGdbMonitorWidget::handleCommandLineEdit);
+    QObject::connect(clearToolButton,               &QToolButton::clicked,                                     this,            &SeerGdbMonitorWidget::handleClearButton);
+    QObject::connect(saveToolButton,                &QToolButton::clicked,                                     this,            &SeerGdbMonitorWidget::handleSaveButton);
+    QObject::connect(printToolButton,               &QToolButton::clicked,                                     this,            &SeerGdbMonitorWidget::handlePrintButton);
+    QObject::connect(helpToolButton,                &QToolButton::clicked,                                     this,            &SeerGdbMonitorWidget::handleHelpButton);
+    QObject::connect(macroButtonGroup,              &QButtonGroup::buttonClicked,                              this,            &SeerGdbMonitorWidget::handleMacroToolButtonClicked);
 
     // Restore window settings.
     readSettings();
 }
 
-SeerMonitorVisualizerWidget::~SeerMonitorVisualizerWidget () {
+SeerGdbMonitorWidget::~SeerGdbMonitorWidget () {
 }
 
-void SeerMonitorVisualizerWidget::handleText (const QString& text) {
+void SeerGdbMonitorWidget::handleText (const QString& text) {
 
     // qDebug() << text;
 
@@ -85,7 +85,7 @@ void SeerMonitorVisualizerWidget::handleText (const QString& text) {
     }
 }
 
-void SeerMonitorVisualizerWidget::handleCommandLineEdit () {
+void SeerGdbMonitorWidget::handleCommandLineEdit () {
 
     QString command = monitorCommandLineEdit->text();
 
@@ -96,12 +96,12 @@ void SeerMonitorVisualizerWidget::handleCommandLineEdit () {
     emit executeGdbMonitorCommand(_monitorId, command);
 }
 
-void SeerMonitorVisualizerWidget::handleClearButton () {
+void SeerGdbMonitorWidget::handleClearButton () {
 
     textEdit->clear();
 }
 
-void SeerMonitorVisualizerWidget::handlePrintButton () {
+void SeerGdbMonitorWidget::handlePrintButton () {
 
     QPrinter printer;
 
@@ -116,7 +116,7 @@ void SeerMonitorVisualizerWidget::handlePrintButton () {
     document->print(&printer);
 }
 
-void SeerMonitorVisualizerWidget::handleSaveButton () {
+void SeerGdbMonitorWidget::handleSaveButton () {
 
     QFileDialog dialog(this, "Seer log file", "./", "Logs (*.log);;Text files (*.txt);;All files (*.*)");
     dialog.setOptions(QFileDialog::DontUseNativeDialog);
@@ -154,7 +154,7 @@ void SeerMonitorVisualizerWidget::handleSaveButton () {
     }
 }
 
-void SeerMonitorVisualizerWidget::handleHelpButton () {
+void SeerGdbMonitorWidget::handleHelpButton () {
 
     SeerHelpPageDialog* help = new SeerHelpPageDialog;
     help->loadFile(":/seer/resources/help/ArrayVisualizer.md");
@@ -162,7 +162,7 @@ void SeerMonitorVisualizerWidget::handleHelpButton () {
     help->raise();
 }
 
-void SeerMonitorVisualizerWidget::handleMacroToolButtonClicked (QAbstractButton* button) {
+void SeerGdbMonitorWidget::handleMacroToolButtonClicked (QAbstractButton* button) {
 
     if (button == nullptr) {
         return;
@@ -181,7 +181,7 @@ void SeerMonitorVisualizerWidget::handleMacroToolButtonClicked (QAbstractButton*
     }
 }
 
-void SeerMonitorVisualizerWidget::writeSettings() {
+void SeerGdbMonitorWidget::writeSettings() {
 
     QSettings settings;
 
@@ -190,7 +190,7 @@ void SeerMonitorVisualizerWidget::writeSettings() {
     } settings.endGroup();
 }
 
-void SeerMonitorVisualizerWidget::readSettings() {
+void SeerGdbMonitorWidget::readSettings() {
 
     QSettings settings;
 
@@ -199,7 +199,7 @@ void SeerMonitorVisualizerWidget::readSettings() {
     } settings.endGroup();
 }
 
-void SeerMonitorVisualizerWidget::resizeEvent (QResizeEvent* event) {
+void SeerGdbMonitorWidget::resizeEvent (QResizeEvent* event) {
 
     writeSettings();
 

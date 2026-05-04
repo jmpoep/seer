@@ -5,15 +5,15 @@
 #pragma once
 
 #include <QtWidgets/QWidget>
-#include "ui_SeerMonitorVisualizerWidget.h"
+#include "ui_SeerGdbMonitorWidget.h"
 
-class SeerMonitorVisualizerWidget : public QWidget, protected Ui::SeerMonitorVisualizerWidgetForm {
+class SeerGdbMonitorWidget : public QWidget, protected Ui::SeerGdbMonitorWidgetForm {
 
     Q_OBJECT
 
     public:
-        explicit SeerMonitorVisualizerWidget (QWidget* parent = 0);
-       ~SeerMonitorVisualizerWidget ();
+        explicit SeerGdbMonitorWidget (QWidget* parent = 0);
+       ~SeerGdbMonitorWidget ();
 
     signals:
         void                executeGdbMonitorCommand            (int monitorid, QString command);
