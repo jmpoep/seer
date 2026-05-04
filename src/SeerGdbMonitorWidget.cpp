@@ -157,7 +157,7 @@ void SeerGdbMonitorWidget::handleSaveButton () {
 void SeerGdbMonitorWidget::handleHelpButton () {
 
     SeerHelpPageDialog* help = new SeerHelpPageDialog;
-    help->loadFile(":/seer/resources/help/ArrayVisualizer.md");
+    help->loadFile(":/seer/resources/help/GdbMonitor.md");
     help->show();
     help->raise();
 }
