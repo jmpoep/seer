@@ -5,9 +5,14 @@
 #include "SeerMonitorVisualizerWidget.h"
 #include "SeerHelpPageDialog.h"
 #include "SeerUtl.h"
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QFontDialog>
 #include <QtPrintSupport/QPrinter>
 #include <QtPrintSupport/QPrintDialog>
 #include <QtGui/QFont>
+#include <QtCore/QTextStream>
+#include <QtCore/QRegularExpression>
 #include <QtCore/QSettings>
 #include <QtCore/QDebug>
 
@@ -21,7 +26,7 @@ SeerMonitorVisualizerWidget::SeerMonitorVisualizerWidget (QWidget* parent) : QWi
 
     // Setup the widgets
     setWindowIcon(QIcon(":/seer/resources/icons/hicolor/64x64/seergdb.png"));
-    setWindowTitle("Seer - GDB Monitor Visualizer");
+    setWindowTitle("Seer - GDB Monitor");
     setAttribute(Qt::WA_DeleteOnClose);
 
     m1ToolButton->setMacroName("M1", "gdbmonitor");
@@ -50,6 +55,7 @@ SeerMonitorVisualizerWidget::SeerMonitorVisualizerWidget (QWidget* parent) : QWi
     // Connect things.
     QObject::connect(monitorCommandLineEdit,        &QLineEdit::returnPressed,                                 this,            &SeerMonitorVisualizerWidget::handleCommandLineEdit);
     QObject::connect(clearToolButton,               &QToolButton::clicked,                                     this,            &SeerMonitorVisualizerWidget::handleClearButton);
+    QObject::connect(saveToolButton,                &QToolButton::clicked,                                     this,            &SeerMonitorVisualizerWidget::handleSaveButton);
     QObject::connect(printToolButton,               &QToolButton::clicked,                                     this,            &SeerMonitorVisualizerWidget::handlePrintButton);
     QObject::connect(helpToolButton,                &QToolButton::clicked,                                     this,            &SeerMonitorVisualizerWidget::handleHelpButton);
     QObject::connect(macroButtonGroup,              &QButtonGroup::buttonClicked,                              this,            &SeerMonitorVisualizerWidget::handleMacroToolButtonClicked);
@@ -62,7 +68,21 @@ SeerMonitorVisualizerWidget::~SeerMonitorVisualizerWidget () {
 }
 
 void SeerMonitorVisualizerWidget::handleText (const QString& text) {
-    qDebug() << text;
+
+    // qDebug() << text;
+
+    if (text.contains(QRegularExpression("^([0-9]+)\\^done,monitor-output="))) {
+
+        // 13^done,monitor-output=\"The following monitor command\\n\"
+        // 13^done,monitor-output=\"\"
+
+        QString id_text = text.section('^', 0,0);
+
+        if (id_text.toInt() == _monitorId) {
+            QString output_text = Seer::parseFirst(text, "monitor-output=", '"', '"', false);
+            textEdit->appendPlainText(Seer::unescape(output_text));
+        }
+    }
 }
 
 void SeerMonitorVisualizerWidget::handleCommandLineEdit () {
@@ -71,13 +91,67 @@ void SeerMonitorVisualizerWidget::handleCommandLineEdit () {
 
     monitorCommandLineEdit->clear();
 
+    textEdit->appendPlainText("(gdbmonitor) " + command);
+
     emit executeGdbMonitorCommand(_monitorId, command);
 }
 
 void SeerMonitorVisualizerWidget::handleClearButton () {
+
+    textEdit->clear();
 }
 
 void SeerMonitorVisualizerWidget::handlePrintButton () {
+
+    QPrinter printer;
+
+    QPrintDialog* dlg = new QPrintDialog(&printer, this);
+
+    if (dlg->exec() != QDialog::Accepted) {
+        return;
+    }
+
+    QTextDocument* document = textEdit->document();
+
+    document->print(&printer);
+}
+
+void SeerMonitorVisualizerWidget::handleSaveButton () {
+
+    QFileDialog dialog(this, "Seer log file", "./", "Logs (*.log);;Text files (*.txt);;All files (*.*)");
+    dialog.setOptions(QFileDialog::DontUseNativeDialog);
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setFileMode(QFileDialog::AnyFile);
+    dialog.setDefaultSuffix("log");
+    dialog.selectFile("gdbmonitor.log");
+
+    if (dialog.exec() != QDialog::Accepted) {
+        return;
+    }
+
+    QStringList files = dialog.selectedFiles();
+
+    if (files.size() == 0) {
+        return;
+    }
+
+    if (files.size() > 1) {
+        QMessageBox::critical(this, tr("Error"), tr("Select only 1 file."));
+        return;
+    }
+
+    QFile file(files[0]);
+
+    if (file.open(QIODevice::ReadWrite)) {
+        QTextStream stream(&file);
+        stream << textEdit->toPlainText();
+        file.flush();
+        file.close();
+
+    }else{
+        QMessageBox::critical(this, tr("Error"), tr("Cannot save log to file."));
+        return;
+    }
 }
 
 void SeerMonitorVisualizerWidget::handleHelpButton () {
@@ -100,6 +174,8 @@ void SeerMonitorVisualizerWidget::handleMacroToolButtonClicked (QAbstractButton*
         if (command == "") {
             continue;
         }
+
+        textEdit->appendPlainText("(gdbmonitor) " + command);
 
         emit executeGdbMonitorCommand(_monitorId, command);
     }

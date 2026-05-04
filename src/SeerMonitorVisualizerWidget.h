@@ -24,6 +24,7 @@ class SeerMonitorVisualizerWidget : public QWidget, protected Ui::SeerMonitorVis
     protected slots:
         void                handleCommandLineEdit               ();
         void                handleClearButton                   ();
+        void                handleSaveButton                    ();
         void                handlePrintButton                   ();
         void                handleHelpButton                    ();
         void                handleMacroToolButtonClicked        (QAbstractButton* button);
