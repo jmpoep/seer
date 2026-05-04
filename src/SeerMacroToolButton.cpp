@@ -26,6 +26,8 @@ SeerMacroToolButton::SeerMacroToolButton(QWidget* parent) : QToolButton(parent) 
     _menu->addAction("Edit Macro", this, &SeerMacroToolButton::handleEditMacro);
 
     connect(_holdTimer, &QTimer::timeout,            this, &SeerMacroToolButton::handleHoldTriggered);
+
+    updateToolTip();
 }
 
 void SeerMacroToolButton::setMacroName (const QString& name, const QString& context) {
@@ -76,6 +78,8 @@ const QString& SeerMacroToolButton::macroFileName () const {
 void SeerMacroToolButton::setCommands (const QStringList& commands) {
 
     _commands = commands;
+
+    updateToolTip();
 }
 
 const QStringList& SeerMacroToolButton::commands () const {
@@ -115,6 +119,8 @@ void SeerMacroToolButton::writeMacro () {
 
 void SeerMacroToolButton::readMacro () {
 
+    updateToolTip();
+
     if (macroFileName() == "") {
         return;
     }
@@ -134,8 +140,28 @@ void SeerMacroToolButton::readMacro () {
 
         file.close();
 
-        setCommands(lines);
+        setCommands(lines); // Will update tooltip, too.
     }
+}
+
+void SeerMacroToolButton::updateToolTip () {
+
+    QString tip;
+
+    if (macroName() == "") {
+        tip += "Macro. ";
+    }else{
+        tip += macroName() + " macro. ";
+    }
+
+    tip += "Click to execute. Hold down to edit.";
+
+    if (commands().count() > 0) {
+        tip += "\n\nPreview:\n\n";
+        tip += commands().join("\n");
+    }
+
+    setToolTip(tip);
 }
 
 void SeerMacroToolButton::mousePressEvent (QMouseEvent* event) {

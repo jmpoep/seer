@@ -23,10 +23,11 @@ class SeerMacroToolButton : public QToolButton {
         void                    setCommands             (const QStringList& commands);
         const QStringList&      commands                () const;
 
+    protected:
         void                    writeMacro              ();
         void                    readMacro               ();
+        void                    updateToolTip           ();
 
-    protected:
         void                    mousePressEvent         (QMouseEvent* event) override;
         void                    mouseReleaseEvent       (QMouseEvent* event) override;
 
