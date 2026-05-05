@@ -81,6 +81,7 @@ void SeerGdbMonitorWidget::handleText (const QString& text) {
         if (id_text.toInt() == _monitorId) {
             QString output_text = Seer::parseFirst(text, "monitor-output=", '"', '"', false);
             textEdit->appendPlainText(Seer::unescape(output_text));
+            textEdit->moveCursor(QTextCursor::End);
         }
     }
 }
@@ -92,6 +93,7 @@ void SeerGdbMonitorWidget::handleCommandLineEdit () {
     monitorCommandLineEdit->clear();
 
     textEdit->appendPlainText("(monitor) " + command);
+    textEdit->moveCursor(QTextCursor::End);
 
     emit executeGdbMonitorCommand(_monitorId, command);
 }
@@ -175,7 +177,8 @@ void SeerGdbMonitorWidget::handleMacroToolButtonClicked (QAbstractButton* button
             continue;
         }
 
-        textEdit->appendPlainText("(gdbmonitor) " + command);
+        textEdit->appendPlainText("(monitor) " + command);
+        textEdit->moveCursor(QTextCursor::End);
 
         emit executeGdbMonitorCommand(_monitorId, command);
     }
