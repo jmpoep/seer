@@ -91,7 +91,7 @@ void SeerGdbMonitorWidget::handleCommandLineEdit () {
 
     monitorCommandLineEdit->clear();
 
-    textEdit->appendPlainText("(gdbmonitor) " + command);
+    textEdit->appendPlainText("(monitor) " + command);
 
     emit executeGdbMonitorCommand(_monitorId, command);
 }
