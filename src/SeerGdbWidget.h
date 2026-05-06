@@ -216,6 +216,7 @@ class SeerGdbWidget : public QWidget, protected Ui::SeerGdbWidgetForm {
         void                                handleManualCommandExecute                  (QString command);
         void                                handleGdbCommand                            (const QString& command, bool ignoreErrors=false);
         void                                handleGdbCommands                           (const QStringList& commands);
+        void                                handleGdbMonitorCommand                     (int id, const QString& command);
         void                                handleGdbExit                               ();
         void                                handleGdbRunExecutable                      (const QString& breakMode, bool loadSessionBreakpoints);
         void                                handleGdbAttachExecutable                   (bool loadSessionBreakpoints);
@@ -356,6 +357,7 @@ class SeerGdbWidget : public QWidget, protected Ui::SeerGdbWidgetForm {
         void                                handleGdbStructVisualizer                   ();
         void                                handleGdbVarVisualizer                      ();
         void                                handleGdbImageVisualizer                    ();
+        void                                handleGdbMonitor                            ();
         void                                handleSplitterMoved                         (int pos, int index);
         void                                handleGdbAssemblyDisassemblyFlavor          ();
         void                                handleGdbAssemblySymbolDemangling           ();
