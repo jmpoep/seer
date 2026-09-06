@@ -40,11 +40,17 @@ apps:
     desktop: usr/share/applications/seergdb.desktop
 
 parts:
+  # ---------------------------------------------------------------------
+  # Main executable. enable-patchelf stays HERE ONLY, because this is the
+  # one file that actually needs its ELF interpreter (PT_INTERP) rewritten
+  # so it runs correctly as a classic-confinement snap. Nothing else in
+  # this part is dlopen()'d, so patchelf touching it is safe.
+  # ---------------------------------------------------------------------
   seergdb:
     plugin: cmake
     source: src
     build-attributes:
-      - enable-patchelf          # classic snap: relink bundled libs to each other
+      - enable-patchelf          # classic snap: fix the executable's interpreter
     cmake-parameters:
       - -DCMAKE_INSTALL_PREFIX=/usr
       - -DQTVERSION=QT6
@@ -65,11 +71,38 @@ parts:
       - libqt6svg6
       - libqt6opengl6t64
       - libqt6openglwidgets6t64
-      - qt6-gtk-platformtheme
-      - qt6-qpa-plugins
       - libfreetype6              # pin the font stack explicitly, all from noble
       - libharfbuzz0b
       - libfontconfig1
+      - libsm6
+      - libice6
+      - libgl1
+      - libglx-mesa0
+      - libegl1
+    stage:
+      - -usr/lib/*/cmake
+      - -usr/include
+    prime:
+      - -usr/lib/*/cmake
+      - -usr/include
+
+  # ---------------------------------------------------------------------
+  # Qt platform plugins + theme integration + their xcb dependencies.
+  # These are ALL loaded via dlopen() at runtime, never exec()'d directly,
+  # so they don't need PT_INTERP patched. Deliberately NO enable-patchelf
+  # here: patchelf is known to corrupt the PT_NOTE/SHT_NOTE relationship
+  # on some ELF files (NixOS/patchelf#217), which breaks Qt's own
+  # lightweight ELF metadata parser and makes every plugin report
+  # "not a Qt plugin (metadata not found)" at runtime even though the
+  # file is otherwise intact. The launcher script's LD_LIBRARY_PATH
+  # already resolves these files' dependencies without any RPATH rewrite.
+  # ---------------------------------------------------------------------
+  qt-plugins:
+    plugin: dump
+    source: .
+    stage-packages:
+      - qt6-gtk-platformtheme
+      - qt6-qpa-plugins
       - libxcb-cursor0
       - libxcb-icccm4
       - libxcb-image0
@@ -83,12 +116,6 @@ parts:
       - libxcb-xkb1
       - libxcb-util1
       - libxkbcommon-x11-0
-      - libsm6
-      - libice6
-      - libgl1
-      - libglx-mesa0
-      - libegl1
-      
     stage:
       - -usr/lib/*/cmake
       - -usr/include
